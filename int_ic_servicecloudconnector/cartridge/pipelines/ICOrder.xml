@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?demandware-pipeline version="2.0"?>
+
+<pipeline type="view">
+  <branch basename="GetSFCCOrder">
+    <segment>
+      <node>
+        <start-node call-mode="private" name="GetSFCCOrder" secure="false"/>
+        <node-display x="0" y="1"/>
+      </node>
+      <simple-transition>
+        <transition-display>
+          <bend-point relative-to="source" x="0" y="1"/>
+        </transition-display>
+      </simple-transition>
+      <node>
+        <pipelet-node pipelet-name="GetOrder" pipelet-set-identifier="bc_api">
+          <key-binding alias="'KKR30108126'" key="OrderNo"/>
+          <key-binding alias="Order" key="Order"/>
+        </pipelet-node>
+        <node-display x="0" y="1"/>
+        <branch basename="b2" source-connector="error">
+          <transition target-connector="in">
+            <transition-display>
+              <bend-point relative-to="source" x="1" y="0"/>
+            </transition-display>
+          </transition>
+          <segment>
+            <node>
+              <end-node name="ERROR"/>
+              <node-display orientation="horizontal" x="1" y="0"/>
+            </node>
+          </segment>
+        </branch>
+      </node>
+      <simple-transition>
+        <transition-display>
+          <bend-point relative-to="source" x="0" y="1"/>
+        </transition-display>
+      </simple-transition>
+      <node>
+        <end-node name="OK"/>
+        <node-display x="0" y="1"/>
+      </node>
+    </segment>
+  </branch>
+  <branch basename="GetOrderList">
+    <segment>
+      <node>
+        <start-node name="GetOrderList" secure="false"/>
+        <node-display x="2" y="1"/>
+      </node>
+      <simple-transition/>
+      <node>
+        <pipelet-node pipelet-name="Script" pipelet-set-identifier="bc_api">
+          <config-property key="Transactional" value="false"/>
+          <config-property key="OnError" value="PIPELET_ERROR"/>
+          <config-property key="ScriptFile" value="order/GetOrderList.ds"/>
+          <key-binding alias="orderList" key="orderList"/>
+          <key-binding alias="sortList" key="sortList"/>
+        </pipelet-node>
+        <node-display x="0" y="1"/>
+        <branch basename="b2" source-connector="error">
+          <transition target-connector="in">
+            <transition-display>
+              <bend-point relative-to="target" x="-1" y="0"/>
+            </transition-display>
+          </transition>
+          <segment>
+            <node>
+              <end-node name="ERROR"/>
+              <node-display orientation="horizontal" x="2" y="0"/>
+            </node>
+          </segment>
+        </branch>
+      </node>
+      <simple-transition>
+        <transition-display>
+          <bend-point relative-to="target" x="0" y="-1"/>
+        </transition-display>
+      </simple-transition>
+      <node>
+        <interaction-node transaction-required="false">
+          <template buffered="true" dynamic="false" name="isobar/order/orderlist.isml"/>
+        </interaction-node>
+        <node-display x="0" y="2"/>
+      </node>
+    </segment>
+  </branch>
+  <branch basename="GetOrderDetail">
+    <segment>
+      <node>
+        <start-node name="GetOrderDetail" secure="false"/>
+        <node-display x="5" y="1"/>
+      </node>
+      <simple-transition/>
+      <node>
+        <pipelet-node pipelet-name="Script" pipelet-set-identifier="bc_api">
+          <config-property key="Transactional" value="false"/>
+          <config-property key="OnError" value="PIPELET_ERROR"/>
+          <config-property key="ScriptFile" value="order/GetOrderDetails.ds"/>
+          <key-binding alias="null" key="ScriptLog"/>
+          <key-binding alias="args.CurrentHttpParameterMap.SFCCOrderID" key="SFCCOrderID"/>
+          <key-binding alias="args.CurrentHttpParameterMap.SFDCOrderID" key="SFDCOrderID"/>
+          <key-binding alias="args.CurrentHttpParameterMap.SFDCurl" key="SFDCurl"/>
+        </pipelet-node>
+        <node-display x="0" y="1"/>
+        <branch basename="b2" source-connector="error">
+          <transition target-connector="in">
+            <transition-display>
+              <bend-point relative-to="source" x="1" y="0"/>
+            </transition-display>
+          </transition>
+          <segment>
+            <node>
+              <end-node name="ERROR"/>
+              <node-display orientation="horizontal" x="1" y="0"/>
+            </node>
+          </segment>
+        </branch>
+      </node>
+      <simple-transition/>
+      <node>
+        <interaction-node transaction-required="false">
+          <template buffered="true" dynamic="false" name="isobar/order/orderdetail"/>
+        </interaction-node>
+        <node-display x="0" y="2"/>
+      </node>
+    </segment>
+  </branch>
+</pipeline>

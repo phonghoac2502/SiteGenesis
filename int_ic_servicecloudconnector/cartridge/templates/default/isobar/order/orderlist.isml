@@ -1,0 +1,86 @@
+Hi!
+This is order list page. <br>
+Need to debug on next pipelet to get OrderNo
+Second time to run
+
+<isscript>
+	importPackage(dw.util);
+	var errorMessage : String = !empty(pdict.ErrorMessage)?StringUtils.stringToHtml(pdict.ErrorMessage):"An error occured.";
+	var errorMessageTitle : String = !empty(pdict.ErrorMessageTitle)?StringUtils.stringToHtml(pdict.ErrorMessageTitle):"Error";
+	var errorAction : String = !empty(pdict.ErrorJSAction)?pdict.ErrorJSAction:"";
+	if ( !empty(pdict.ErrorText) )
+	{
+		errorMessage += "<br/><br/>Error Text:<br/>";
+		errorMessage += StringUtils.stringToHtml(pdict.ErrorText);		
+	}	
+</isscript>
+<isif condition="${!empty(errorMessage)}">
+	<script type="text/javascript">
+	<!--
+		Dialog.message('<isprint value="${errorMessageTitle}" encoding="off">',
+			'<isprint value="${errorMessage}" encoding="off">',
+			function(){<isprint value="${errorAction}" encoding="off">});
+	//-->
+	</script>
+<iselseif condition="${!empty(pdict.ErrorJSAction)}">
+	<script type="text/javascript">
+<!--
+	<isprint value="${errorAction}" encoding="off">
+//-->
+</script>
+</isif>
+
+<table border="1">
+<thead>
+	<tr>
+		<td>
+			Order No
+		</td>
+		<td>
+			Created Date
+		</td>
+		<td>
+			Status
+		</td>
+		<td>
+			SFDC Account ID
+		</td>
+		<td>
+			SFDC Order ID
+		</td>
+		<td>
+			SFDC Url
+		</td>
+	</tr>
+</thead>
+<isloop items="${pdict.orderList}" var="currentOrder">	
+	<isset name="SFCCOrderID" value="${currentOrder['order.orderNo']}" scope="page" /> 
+	<isset name="SFDCOrderID" value="${currentOrder['order.custom.salesforceOrderId']}" scope="page" />		
+	<tr>
+		<td>
+			<a href="${dw.web.URLUtils.url('ICOrder-GetOrderDetail', 'SFCCOrderID', SFCCOrderID, 'SFDCOrderID', SFDCOrderID)}"><isprint value="${JSON.stringify(currentOrder['order.orderNo'])}"/></a>
+		</td>
+		<td>
+			<isif condition="${currentOrder['order.creationDate'] != 'null'}" >
+				<isprint value="${JSON.stringify(currentOrder['order.creationDate'])}" />
+			</isif>			
+		</td>
+		<td>
+			<isif condition="${currentOrder['order.status.displayValue'] != null}" >
+				<isprint value="${JSON.stringify(currentOrder['order.status.displayValue'])}" />
+			</isif>			
+		</td> 
+		<td>
+			<isif condition="${currentOrder['order.customer.profile.custom.salesforceAccountID'] != 'null'}" >
+				<isprint value="${JSON.stringify(currentOrder['order.customer.profile.custom.salesforceAccountID'])}" />
+			</isif>
+		</td>
+		<td>
+			<isif condition="${currentOrder['order.custom.salesforceOrderId'] != 'null'}" >
+				<isprint value="${JSON.stringify(currentOrder['order.custom.salesforceOrderId'])}" />
+			</isif> 			
+		</td>		
+	</tr>
+
+</isloop>
+</table>
