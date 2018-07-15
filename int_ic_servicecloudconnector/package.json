@@ -1,4 +1,0 @@
-{
-  "main": "./cartridge/scripts/Registry.js",
-  "hooks" : "./hooks.json"
-}
