@@ -1,0 +1,28 @@
+{
+  "hooks": [    
+    {
+      "name": "app.customer.created",
+      "script": "~/cartridge/scripts/hooks/customer"
+    },
+    {
+      "name": "app.customer.updated",
+      "script": "~/cartridge/scripts/hooks/customer"
+    },
+    {
+     "name": "app.order.getlist",
+     "script": "~/cartridge/scripts/hooks/order"
+    },
+    {
+     "name": "app.order.getdetail",
+     "script": "~/cartridge/scripts/hooks/order"
+    },
+    {
+     "name": "app.order.exported",
+     "script": "~/cartridge/scripts/hooks/order"
+    },
+    {
+     "name": "dw.ocapi.shop.order.afterPATCH",
+     "script": "~/cartridge/scripts/hooks/order"
+    }    
+  ]
+}

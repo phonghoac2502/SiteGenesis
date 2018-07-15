@@ -1,0 +1,49 @@
+/**
+* Script file for use in the Script pipelet node.
+* To define input and output parameters, create entries of the form:
+*
+* @<paramUsageType> <paramName> : <paramDataType> [<paramComment>]
+*
+* where
+*   <paramUsageType> can be either 'input' or 'output'
+*   <paramName> can be any valid parameter name
+*   <paramDataType> identifies the type of the parameter
+*   <paramComment> is an optional comment
+*
+* For example:
+*
+*-   @input ExampleIn : String This is a sample comment.
+*-   @output ExampleOut : Number
+*
+*/
+var OrderMgr = require('dw/order/OrderMgr');  
+var CustomerMgr = require('dw/customer/CustomerMgr');
+var OrderModel = require('../models/orderModel');
+
+/**
+ * @type {module:services/rest}
+ */
+var RestService = require('../services/rest');
+
+/**
+ * @type {dw.system.Logger}
+ */
+var LOGGER = require('dw/system/Logger').getLogger('ICOrderModel', 'createOrder');
+
+function execute( args : PipelineDictionary ) : Number
+{  	   
+  var Orders : SeekableIterator = OrderMgr.searchOrders('salesforceOrderId = null','creationDate desc', null);   
+   while(Orders.hasNext()){
+   	var order : Order = Orders.next();   	 
+   	var orderJSON = OrderModel.call("getOrderMappingData", order);
+	var result = RestService.get(RestService.serviceIDs.create).call(RestService.servicePaths.create.order, JSON.parse(orderJSON));		
+	if(result.status == 'OK') {
+		order.setExportStatus(1); 
+	    order.custom.salesforceOrderId = result.object.responseObj.salesforceOrderId; 
+	    order.custom.sfdcOrderStatus   = 'EXPORTED';	 	
+	} else {
+		LOGGER('Cant create Order: {0} - Messenger: {1}',order.orderNo,result);
+	}		
+   }   
+   return PIPELET_NEXT;
+}
